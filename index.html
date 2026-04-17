@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CredMind | Premium AI Credit System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #F5F3FF;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --text: #111827;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --rounded-lg: 24px;
+            --rounded-md: 16px;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit',sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* Navigation */
+        nav {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.25rem 5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--text); cursor: pointer; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-links a { text-decoration: none; color: var(--text-light); font-weight: 500; font-size: 0.95rem; transition: 0.3s; cursor: pointer; }
+        .nav-links a.active { color: var(--primary); font-weight: 700; }
+
+        .btn {
+            padding: 0.75rem 1.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124,58,237,0.2); }
+
+        /* Page Transitions */
+        section { display: none; min-height: 90vh; padding: 4rem 5rem; }
+        section.active { display: block; animation: fadeIn 0.5s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Home Page */
+        .hero { display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: center; margin-top: 2rem; }
+        .hero h1 { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 2rem; }
+        .hero p { font-size: 1.2rem; color: var(--text-light); margin-bottom: 3rem; line-height: 1.6; }
+
+        /* Analysis Page */
+        .analysis-container { max-width: 1000px; margin: 0 auto; }
+        .card { background: var(--surface); padding: 2.5rem; border-radius: var(--rounded-lg); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 2rem; }
+        
+        .tab-bar { display: flex; gap: 10px; margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); }
+        .tab-item { padding: 1rem 1.5rem; color: var(--text-light); font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-item.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.85rem; font-weight: 700; color: var(--text); padding-left: 2px; }
+        input, select { padding: 0.8rem 1rem; border: 1px solid var(--border); border-radius: 12px; font-size: 1rem; color: var(--text); outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+
+        #upload-box, .upload-box { 
+            border: 2px dashed var(--border); 
+            padding: 2.5rem 1.5rem; 
+            text-align: center; 
+            border-radius: var(--rounded-md); 
+            cursor: pointer; 
+            transition: 0.3s; 
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        #upload-box:hover, .upload-box:hover { 
+            border-color: var(--primary); 
+            background: var(--primary-light); 
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Page */
+        .dash-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+        .status-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        
+        .risk-gauge { height: 12px; background: #E5E7EB; border-radius: 10px; overflow: hidden; margin: 1.5rem 0; position: relative; }
+        .risk-fill { height: 100%; background: linear-gradient(90deg, #10B981 0%, #F59E0B 50%, #EF4444 100%); transition: 1s ease-in-out; }
+
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+        .metric-card { background: #F9FAFB; padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border); }
+        .metric-label { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05rem; }
+        .metric-value { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+
+        /* Chat UI */
+        .chat-wrap { height: 600px; display: flex; flex-direction: column; background: white; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
+        #chat-stream { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .chat-bubble { padding: 1rem 1.25rem; border-radius: 18px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
+        .bubble-bank { background: #F3F4F6; align-self: flex-start; }
+        .bubble-user { background: var(--primary); color: white; align-self: flex-end; }
+        .chat-input { padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .chat-input input { flex: 1; margin-bottom: 0; }
+
+        /* Footer */
+        footer { padding: 4rem 5rem; text-align: center; border-top: 1px solid var(--border); background: white; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo" onclick="showPage('home')">Cred<span>Mind</span></div>
+        <div class="nav-links">
+            <a onclick="showPage('home')" id="link-home">Home</a>
+            <a onclick="showPage('analysis')" id="link-analysis">Credit Analysis</a>
+            <a onclick="showPage('dashboard')" id="link-dashboard">Dashboard</a>
+        </div>
+        <button class="btn" onclick="showPage('analysis')">Get Financing</button>
+    </nav>
+
+    <!-- Page 1: Home -->
+    <section id="home" class="active">
+        <div class="hero">
+            <div>
+                <h1 style="color: #111827;">Intelligent Credit for the Modern Era.</h1>
+                <p>Harnessing advanced AI to verify documents and provide instant, accurate credit assessments. Professional banking technology, built for everyone.</p>
+                <div style="display: flex; gap:1.5rem;">
+                    <button class="btn" onclick="showPage('analysis')" style="padding: 1.2rem 3rem; font-size: 1.1rem;">Start Analysis</button>
+                    <button class="btn" onclick="showPage('dashboard')" style="background: white; border: 1px solid var(--border); color: var(--text);">View Dashboard</button>
+                </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop" style="width: 100%; border-radius: 40px; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.15);">
+        </div>
+    </section>
+
+    <!-- Page 2: Analysis -->
+    <section id="analysis">
+        <div class="analysis-container">
+            <h1 style="margin-bottom: 1rem; font-size: 2.5rem;">Document Verification</h1>
+            <p style="color:var(--text-light); margin-bottom: 3rem;">Supply all three documents for a comprehensive cross-check analysis.</p>
+            
+            <div style="display: flex; gap: 1.5rem; margin-bottom: 3rem; width: 100%;">
+                <div class="upload-box" onclick="document.getElementById('file-bank').click()" style="flex: 1;">
+                    <div style="font-size: 2rem;">🏦</div>
+                    <div style="font-weight:700;">Bank Statement</div>
+                    <p style="font-size:0.8rem; color:var(--text-light); margin:0;" id="status-bank">Required (PDF/JPG)</p>
+                    <input type="file" id="file-bank" hidden onchange="processDocs(this.files, 'bank')">
+                </div>
+                <div class="upload-box" onclick="document.getElementById('file-itr').click()" style="flex: 1;">
+                    <div style="font-size: 2rem;">📜</div>
+                    <div style="font-weight:700;">ITR Filing</div>
+                    <p style="font-size:0.8rem; color:var(--text-light); margin:0;" id="status-itr">Required (PDF/JPG)</p>
+                    <input type="file" id="file-itr" hidden onchange="processDocs(this.files, 'itr')">
+                </div>
+                <div class="upload-box" onclick="document.getElementById('file-salary').click()" style="flex: 1;">
+                    <div style="font-size: 2rem;">💵</div>
+                    <div style="font-weight:700;">Salary Slip</div>
+                    <p style="font-size:0.8rem; color:var(--text-light); margin:0;" id="status-salary">Required (PDF/JPG)</p>
+                    <input type="file" id="file-salary" hidden onchange="processDocs(this.files, 'salary')">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="tabTo('sec-personal')">Personal</div>
+                    <div class="tab-item" onclick="tabTo('sec-employment')">Employment</div>
+                    <div class="tab-item" onclick="tabTo('sec-financial')">Financials</div>
+                    <div class="tab-item" onclick="tabTo('sec-loan')">Loan Details</div>
+                </div>
+
+                <div id="sec-personal" class="tab-content active">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Full Legal Name</label><input type="text" id="name" placeholder="John Doe"></div>
+                        <div class="form-group"><label>Age</label><input type="number" id="age" value="34"></div>
+                        <div class="form-group"><label>Residential City</label><input type="text" id="city" placeholder="Pune"></div>
+                        <div class="form-group"><label>Identity Ref (PAN/SSN)</label><input type="text" id="pan" value="ABCDE1234F"></div>
+                    </div>
+                </div>
+
+                <div id="sec-employment" class="tab-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Employment Type</label><select id="emp_type"><option>Salaried</option><option>Self-Employed</option><option>Other</option></select></div>
+                        <div class="form-group"><label>Organization Name</label><input type="text" id="employer" value="TCS"></div>
+                        <div class="form-group"><label>Experience (Years)</label><input type="number" id="exp_total" value="9"></div>
+                    </div>
+                </div>
+
+                <div id="sec-financial" class="tab-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Monthly In-hand Salary</label><input type="number" id="monthly_salary" value="65000"></div>
+                        <div class="form-group"><label>Existing EMI Commitments</label><input type="number" id="existing_emi" value="12000"></div>
+                        <div class="form-group"><label>CIBIL / Credit Score</label><input type="number" id="cibil" value="720"></div>
+                        <div class="form-group"><label>Avg Bank Balance</label><input type="number" id="bank_balance" value="45000"></div>
+                    </div>
+                </div>
+
+                <div id="sec-loan" class="tab-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Desired Loan Principle</label><input type="number" id="loan_amount" value="500000"></div>
+                        <div class="form-group"><label>Term Duration (Months)</label><input type="number" id="loan_tenure" value="36"></div>
+                        <div class="form-group"><label>Specified Purpose</label><input type="text" id="loan_purpose" placeholder="Personal Use"></div>
+                    </div>
+                </div>
+
+                <button class="btn" style="width:100%; margin-top: 3rem; padding: 1.2rem; font-size: 1.1rem;" onclick="runAppraisal()">Run Risk Model Analysis</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page 3: Dashboard -->
+    <section id="dashboard">
+        <div class="dash-grid">
+            <div>
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="status-header">
+                        <div>
+                            <h2>Bank Appraisal Report</h2>
+                            <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;" id="dash-date">Draft Version</p>
+                        </div>
+                        <div id="dash-verdict" style="font-weight: 800; font-size: 1.5rem;">No Analysis Data</div>
+                    </div>
+                    <p style="color: var(--text-light);" id="dash-reason">Complete the application to view results.</p>
+                    
+                    <div class="risk-gauge"><div id="risk-bar" class="risk-fill" style="width: 0%;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--text-light);">
+                        <span>LOW RISK</span>
+                        <span>MODERATE</span>
+                        <span>HIGH RISK</span>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-label">Appraisal Rate</div><div class="metric-value" id="val-rate">0%</div></div>
+                        <div class="metric-card"><div class="metric-label">Officer's Principle</div><div class="metric-value" id="val-p">₹0</div></div>
+                    </div>
+                </div>
+
+                <!-- Strong/Weak Points Divs -->
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="card" style="background: #F0FDF4; border-color: #BBF7D0;">
+                        <h4 style="color: #166534; margin-bottom: 1rem;">✅ Strong Points</h4>
+                        <ul id="list-strong" style="font-size: 0.9rem; color: #166534; padding-left: 1.25rem;"></ul>
+                    </div>
+                    <div class="card" style="background: #FFF1F2; border-color: #FECDD3;">
+                        <h4 style="color: #9F1239; margin-bottom: 1rem;">⚠️ Weak Points</h4>
+                        <ul id="list-weak" style="font-size: 0.9rem; color: #9F1239; padding-left: 1.25rem;"></ul>
+                    </div>
+                </div>
+
+                <!-- Disparities Card -->
+                <div id="card-disparities" class="card" style="display: none; background: #FFF7ED; border-color: #FED7AA; border-left: 6px solid #EA580C;">
+                    <h4 style="color: #9A3412;">🚩 Document Inconsistencies Detected</h4>
+                    <p style="font-size: 0.85rem; color: #9A3412; margin: 0.5rem 0 1rem;">Our neural audit found the following disparities across your files:</p>
+                    <ul id="list-disparities" style="font-size: 0.9rem; color: #9A3412; padding-left: 1.25rem;"></ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Official Credit Summary</h3>
+                    <p id="credit-summary" style="margin-top: 1rem; line-height: 1.6; color: var(--text-light);">Analysis pending document verification.</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="chat-wrap">
+                    <div style="padding: 1.25rem; border-bottom: 1px solid var(--border); font-weight: 800;">👨‍💼 AI Reporting Officer</div>
+                    <div id="chat-stream">
+                        <div class="chat-bubble bubble-bank">Provide documents to begin.</div>
+                    </div>
+                    <div class="chat-input" id="chat-controls" style="display: none;">
+                        <input type="text" id="chat-in" placeholder="Query officer for specifics..." onkeypress="if(event.key==='Enter') sendChat()">
+                        <button class="btn" onclick="sendChat()" style="padding: 0.5rem 1.2rem;">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="logo">Cred<span>Mind</span></div>
+        <p style="margin-top: 1rem; color: var(--text-light); font-size: 0.9rem;">© 2026 CredMind Advanced Credit Infrastructure.<br>Bank-Grade Security | Neural Document Parsing</p>
+    </footer>
+
+    <script>
+        let lastProfile = null;
+        let lastResult = null;
+
+        function showPage(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            const link = document.getElementById('link-' + id);
+            if (link) link.classList.add('active');
+        }
+
+        function tabTo(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        async function processDocs(files, type) {
+            const status = document.getElementById('status-' + type);
+            status.innerText = 'Neural Parsing...';
+            const fd = new FormData();
+            for (let f of files) fd.append('files', f);
+            try {
+                const r = await fetch('/parse', { method: 'POST', body: fd });
+                const d = await r.json();
+                Object.keys(d).forEach(k => { if(document.getElementById(k)) document.getElementById(k).value = d[k]; });
+                status.innerText = '✔ Verified';
+                status.style.color = '#10B981';
+            } catch (e) { status.innerText = '❌ Error'; status.style.color = '#EF4444'; }
+        }
+
+        async function runAppraisal() {
+            const profile = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                city: document.getElementById('city').value,
+                monthly_salary: document.getElementById('monthly_salary').value,
+                cibil: document.getElementById('cibil').value,
+                loan_amount: document.getElementById('loan_amount').value,
+                loan_tenure: document.getElementById('loan_tenure').value,
+                loan_purpose: document.getElementById('loan_purpose').value || "No Purpose Stated",
+                employer: document.getElementById('employer').value
+            };
+            lastProfile = profile;
+            
+            try {
+                const r = await fetch('/analyze', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(profile) });
+                const res = await r.json();
+                lastResult = res;
+
+                // Update Dashboard Status
+                const now = new Date();
+                document.getElementById('dash-date').innerText = 'APPR-DATE: ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                document.getElementById('dash-verdict').innerText = res.verdict.toUpperCase();
+                document.getElementById('dash-verdict').style.color = res.verdict === 'Approved' ? '#059669' : '#DC2626';
+                document.getElementById('dash-reason').innerText = res.reason;
+                document.getElementById('risk-bar').style.width = res.risk_score + '%';
+                
+                // Metrics
+                document.getElementById('val-rate').innerText = res.interest_rate || "0%";
+                document.getElementById('val-p').innerText = res.loan_amount || "₹0";
+
+                // Strong/Weak Points
+                const strongList = document.getElementById('list-strong');
+                strongList.innerHTML = (res.strong_points || []).map(p => `<li>${p}</li>`).join('');
+                
+                const weakList = document.getElementById('list-weak');
+                weakList.innerHTML = (res.weak_points || []).map(p => `<li>${p}</li>`).join('');
+
+                // Disparities
+                const dispCard = document.getElementById('card-disparities');
+                const dispList = document.getElementById('list-disparities');
+                if (res.disparities && res.disparities.length > 0) {
+                    dispCard.style.display = 'block';
+                    dispList.innerHTML = res.disparities.map(d => `<li>${d}</li>`).join('');
+                } else {
+                    dispCard.style.display = 'none';
+                }
+
+                document.getElementById('credit-summary').innerText = `Officer Verdict: The profile presents a ${res.risk_score}% risk profile. All documentation cross-checked via neural inference.`;
+
+                // Chat
+                document.getElementById('chat-controls').style.display = 'flex';
+                document.getElementById('chat-stream').innerHTML = `<div class="chat-bubble bubble-bank">Analysis complete for ${profile.name}. I've flagged any disparities found in your documents. Ask me anything about the ${res.interest_rate} rate assigned.</div>`;
+
+                showPage('dashboard');
+            } catch (e) { alert("Analysis failed."); }
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-in');
+            const msg = input.value.trim();
+            if(!msg) return;
+            const stream = document.getElementById('chat-stream');
+            
+            stream.innerHTML += `<div class="chat-bubble bubble-user">${msg}</div>`;
+            input.value = '';
+            stream.scrollTop = stream.scrollHeight;
+
+            const tId = 't-' + Date.now();
+            stream.innerHTML += `<div id="${tId}" class="chat-bubble bubble-bank" style="font-style:italic; opacity:0.7;">Drafting Internal Response...</div>`;
+            stream.scrollTop = stream.scrollHeight;
+
+            try {
+                const r = await fetch('/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ profile: lastProfile, verdict: lastResult, question: msg }) });
+                const d = await r.json();
+                const bubble = document.getElementById(tId);
+                bubble.innerText = d.response || d.error;
+                bubble.style.fontStyle = 'normal';
+                bubble.style.opacity = '1';
+            } catch (e) { document.getElementById(tId).innerText = "System Timeout."; }
+            stream.scrollTop = stream.scrollHeight;
+        }
+    </script>
+</body>
+</html>
