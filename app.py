@@ -5,6 +5,7 @@ from typing import List
 from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import google.generativeai as genai
 import uvicorn
@@ -12,6 +13,15 @@ import uvicorn
 load_dotenv(override=True)
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Configure Gemini
 api_key = os.getenv("GEMINI_API_KEY")
